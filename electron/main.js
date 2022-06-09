@@ -33,10 +33,28 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
 
-ipcMain.on("connect-swarm", async (event, data) => {
-    await protocol.createSwarm(data);
+ipcMain.on("peer-count", (event, data) => {
+    event.reply("peer-count", protocol.peerCount);
+});
 
-    protocol.events.subscribe((event) => {
-        console.log(event);
+ipcMain.on("connect-swarm", async (event, data) => {
+    protocol.createSwarm(data).then(() => {
+        event.reply("swarm-connected");
+
+        event.reply("peer-count", protocol.peerCount);
+    });
+
+    protocol.events.subscribe((protocolEvent) => {
+        console.log(protocolEvent);
+
+        if (protocolEvent.type === "peer-count") event.reply("peer-count", protocolEvent.count);
     });
 });
+
+ipcMain.on("disconnect-swarm", (event, data) => {
+    protocol.killSwarm().then(() => {
+        event.reply("swarm-disconnected");
+
+        event.reply("peer-count", protocol.peerCount);
+    });
+})

@@ -5,14 +5,26 @@ const SetupPage = () => {
     let router = useRouter();
 
     let [domain, setDomain] = createSignal('');
+    let [connecting, setConnecting] = createSignal(false);
 
     const joinSwarm = () => {
         send("connect-swarm", domain());
+
+        setConnecting(true);
+
+        receive("swarm-connected", () => {
+            router.push("/home");
+        });
     }
 
     return (
         <div class="flex flex-col w-full h-full justify-center items-center">
-            <div
+            {connecting() && <div class={"flex space-x-2 items-center"}>
+                <div>Connecting...</div>
+                <div class={"animate-spin w-5 h-5 border-l border-t border-green-500 border-1 rounded-full"}></div>
+            </div>}
+
+            {!connecting() && <div
                 class="flex flex-col w-auto max-w-sm h-auto p-5 border-l border-t border-r border-b bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl shadow-gray-400 dark:shadow-black space-y-10">
                 <div class="flex flex-col justify-center items-center text-center space-y-1">
                     <div class="text-2xl font-bold text-green-600">PeerShare</div>
@@ -40,7 +52,7 @@ const SetupPage = () => {
                         Join
                     </div>
                 </div>
-            </div>
+            </div>}
         </div>
     );
 };
