@@ -1,14 +1,11 @@
 const {contextBridge, ipcRenderer} = require('electron');
 
 contextBridge.exposeInMainWorld('send', (event, data) => {
-        console.log(event, data);
-
         ipcRenderer.send(event, data);
     }
 );
 contextBridge.exposeInMainWorld('receive', (event, listener) => {
         ipcRenderer.on(event, listener);
-        ipcRenderer.on(event, console.log);
     }
 );
 

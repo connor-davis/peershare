@@ -1,7 +1,7 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path');
 const Protocol = require('../protocol');
-const protocol = new Protocol();
+let protocol = new Protocol();
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -33,12 +33,28 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
 
+ipcMain.on("add-file", (event, data) => {
+    protocol.addFile(data, true, (event, data) => event.reply(event, data));
+
+    event.reply("file-list", protocol.files);
+});
+
+ipcMain.on("remove-file", (event, data) => {
+    protocol.removeFile(data, true, (event, data) => event.reply(event, data));
+
+    event.reply("file-list", protocol.files);
+});
+
+ipcMain.on("download-file", (event, path) => {
+    protocol.events.next({ type: "download-file", key: path });
+});
+
 ipcMain.on("peer-count", (event, data) => {
     event.reply("peer-count", protocol.peerCount);
 });
 
 ipcMain.on("connect-swarm", async (event, data) => {
-    protocol.createSwarm(data).then(() => {
+    protocol.createSwarm(data, (ev, data) => event.reply(ev, data)).then(() => {
         event.reply("swarm-connected");
 
         event.reply("peer-count", protocol.peerCount);
@@ -54,6 +70,8 @@ ipcMain.on("connect-swarm", async (event, data) => {
 ipcMain.on("disconnect-swarm", (event, data) => {
     protocol.killSwarm().then(() => {
         event.reply("swarm-disconnected");
+
+        protocol = new Protocol();
 
         event.reply("peer-count", protocol.peerCount);
     });

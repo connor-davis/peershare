@@ -5,13 +5,16 @@ const UploadNode = require("./UploadNode");
 const DownloadNode = require("./DownloadNode");
 
 class Protocol {
-    constructor() {
+    constructor(reply) {
+        this.reply = reply;
         this.peerCount = 0;
         this.connections = [];
+        this.files = new Set([]);
         this.events = new Subject();
     }
 
-    async createSwarm(domain) {
+    async createSwarm(domain, reply = (event, data) => {
+    }) {
         this.peerCount = 0;
 
         console.log('Creating swarm on - ' + domain);
@@ -28,6 +31,11 @@ class Protocol {
         });
 
         this.swarm.on("connection", (connection, information) => {
+            if (this.peerCount > 0) {
+                information.backoff();
+                connection.destroy();
+            }
+
             if (information.type === 'utp') {
                 information.backoff();
                 connection.destroy();
@@ -39,29 +47,49 @@ class Protocol {
 
             this.events.next({type: "peer-count", count: this.peerCount});
 
-            connection.write(JSON.stringify({type: "ping"}));
             connection.on("data", (data) =>
                 this.events.next(JSON.parse(data.toString()))
             );
 
             this.events.subscribe((event) => {
                 if (event.type === "disconnect") {
+                    if (this.peerCount === 0) {
+                        this.files = new Set([]);
+
+                        reply("file-list", this.files);
+                    }
+
                     if (this.peerCount > 0) {
                         this.peerCount = this.peerCount - 1;
 
                         this.events.next({type: "peer-count", count: this.peerCount});
+
+                        this.connections = this.connections.filter((old) => old !== connection);
                     }
 
-                    return connection.end();
+                    connection.end();
+                    connection.destroy();
+
+                    return;
                 }
 
-                if (event.type === "pong") return console.log("Peer pong.");
+                if (event.type === "local-file-added") return connection.write(JSON.stringify({
+                    ...event,
+                    type: "remote-file-added"
+                }));
 
-                if (event.type === "ping") {
-                    console.log("Peer ping.");
+                if (event.type === "local-file-removed") return connection.write(JSON.stringify({
+                    ...event,
+                    type: "remote-file-removed"
+                }));
 
-                    return connection.write(JSON.stringify({type: "pong"}));
-                }
+                if (event.type === "remote-file-added") return this.addFile(event.file, false, reply);
+                if (event.type === "remote-file-removed") return this.removeFile(event.file, false, reply);
+
+                if (event.type === "download-file") return connection.write(JSON.stringify({
+                    type: "request-download",
+                    key: event.key
+                }));
 
                 if (event.type === "request-download") {
                     const {key} = event;
@@ -70,9 +98,27 @@ class Protocol {
                     const node = new UploadNode(key, size);
 
                     node.events.subscribe((nodeEvent) => {
-                        if (nodeEvent.type === "progress") return this.events.next(nodeEvent);
-                        if (nodeEvent.type === "file-uploaded") return this.events.next(nodeEvent);
-                        if (nodeEvent.type === "upload-ready") return connection.write(JSON.stringify(nodeEvent));
+                        if (nodeEvent.type === "progress") return reply("progress", {
+                            upload: {
+                                progress: nodeEvent.progress.percentage,
+                                eta: nodeEvent.progress.eta,
+                                speed: nodeEvent.progress.speed
+                            },
+                            key,
+                        });
+                        if (nodeEvent.type === "file-uploaded") return reply("complete", {
+                            key,
+                            upload: true,
+                            download: false
+                        });
+                        if (nodeEvent.type === "upload-ready") {
+                            reply("started", {
+                                key,
+                                upload: true,
+                                download: false
+                            });
+                            return connection.write(JSON.stringify(nodeEvent));
+                        }
                     });
 
                     return;
@@ -83,9 +129,26 @@ class Protocol {
 
                     const node = new DownloadNode(key, size);
 
+                    reply("started", {
+                        key,
+                        upload: false,
+                        download: true
+                    });
+
                     node.events.subscribe((nodeEvent) => {
-                        if (nodeEvent.type === "progress") return this.events.next(nodeEvent);
-                        if (nodeEvent.type === "file-downloaded") return this.events.next(nodeEvent);
+                        if (nodeEvent.type === "progress") return reply("progress", {
+                            download: {
+                                progress: nodeEvent.progress.percentage,
+                                eta: nodeEvent.progress.eta,
+                                speed: nodeEvent.progress.speed
+                            },
+                            key,
+                        });
+                        if (nodeEvent.type === "file-downloaded") return reply("complete", {
+                            key,
+                            upload: false,
+                            download: true
+                        });
                     });
                 }
             });
@@ -103,7 +166,7 @@ class Protocol {
         return new Promise(async (resolve, reject) => {
             console.log(this.topic);
 
-            this.connections.forEach((connection) => connection.write(JSON.stringify({ type: "disconnect" })));
+            this.connections.forEach((connection) => connection.write(JSON.stringify({type: "disconnect"})));
 
             await this.swarm.leave(this.topic);
             await this.discovery.destroy();
@@ -115,6 +178,28 @@ class Protocol {
 
             resolve(this.peerCount);
         });
+    }
+
+    addFile(file, forRemote = true, reply = (event, data) => {
+    }) {
+        file = {...file, remote: !forRemote};
+
+        this.files.add(file);
+
+        if (forRemote) this.events.next({type: "local-file-added", file: {...file, remote: forRemote}});
+        else reply("file-list", this.files);
+
+        return file;
+    }
+
+    removeFile(file, forRemote = true, reply = (event, data) => {
+    }) {
+        this.files = new Set([...this.files].filter((el) => el.path !== file.path));
+
+        if (forRemote) this.events.next({type: "local-file-removed", file});
+        else reply("file-list", this.files);
+
+        return file;
     }
 }
 
