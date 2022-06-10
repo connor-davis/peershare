@@ -4,10 +4,15 @@ const {unlinkSync} = require("fs");
 const Protocol = require('./protocol');
 let protocol = new Protocol();
 
-const createWindow = () => {
+let mainWindow, splashWindow;
+
+const createMainWindow = () => {
     const win = new BrowserWindow({
         width: 1280,
         height: 720,
+        show: false,
+        frame: false,
+        center: true,
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, 'preload.js'),
@@ -15,23 +20,68 @@ const createWindow = () => {
     });
 
     let url = `file://${path.join(__dirname, 'index.html')}`;
+    url = 'http://localhost:3000';
+
+    win.loadURL(url).then();
+
+    return win;
+};
+
+const createSplashWindow = () => {
+    const win = new BrowserWindow({
+        width: 480,
+        height: 240,
+        frame: false,
+        center: true,
+    });
+
+    let url = `file://${path.join(__dirname, "../public", 'splash.html')}`;
     // url = 'http://localhost:3000';
 
     win.loadURL(url).then();
+
+    return win;
 };
 
 app.requestSingleInstanceLock();
 
 app.whenReady().then(() => {
-    createWindow();
+    mainWindow = createMainWindow();
+    splashWindow = createSplashWindow();
+
+    setTimeout(() => {
+        splashWindow.close();
+        mainWindow.show();
+    }, 5000);
 
     app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+        if (BrowserWindow.getAllWindows().length === 0) {
+            mainWindow = createMainWindow();
+            splashWindow = createSplashWindow();
+
+            setTimeout(() => {
+                splashWindow.close();
+                mainWindow.show();
+            }, 5000);
+        }
     });
 });
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
+});
+
+ipcMain.on("minimizeWindow", (_, __) => {
+    mainWindow.minimize();
+});
+
+ipcMain.on("toggleMaximizeWindow", (_, __) => {
+    if (mainWindow.isMaximized()) mainWindow.unmaximize();
+    else mainWindow.maximize();
+});
+
+ipcMain.on("closeWindow", (_, __) => {
+    mainWindow.close();
 });
 
 ipcMain.on("add-file", (event, data) => {

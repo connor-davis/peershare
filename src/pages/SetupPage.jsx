@@ -5,10 +5,13 @@ const SetupPage = () => {
     let router = useRouter();
 
     let [domain, setDomain] = createSignal('');
+    let [password, setPassword] = createSignal('');
     let [connecting, setConnecting] = createSignal(false);
 
     const joinSwarm = () => {
-        send("connect-swarm", domain());
+        if (domain().length === 0 || password().length === 0) return console.log("Missing information...");
+
+        send("connect-swarm", domain() + "@" + password());
 
         setConnecting(true);
 
@@ -38,9 +41,22 @@ const SetupPage = () => {
                         name="domain"
                         id="domain"
                         autoComplete="domain"
-                        placeholder="The domain to connect to, e.g. test"
+                        placeholder="The domain to connect to, e.g. test."
                         value={domain()}
                         onChange={(event) => setDomain(event.target.value)}
+                        class="px-3 py-2 bg-gray-200 dark:bg-gray-900 rounded-lg text-black dark:text-white outline-none select-none focus:outline-green-500"
+                    />
+                    <input
+                        type="text"
+                        name="password"
+                        id="password"
+                        autoComplete="password"
+                        placeholder="The password - makes the domain unique."
+                        value={password()}
+                        onChange={(event) => setPassword(event.target.value)}
+                        onKeyDown={(event) => {
+                            if (event.key === "Enter") joinSwarm()
+                        }}
                         class="px-3 py-2 bg-gray-200 dark:bg-gray-900 rounded-lg text-black dark:text-white outline-none select-none focus:outline-green-500"
                     />
                 </form>
@@ -48,9 +64,6 @@ const SetupPage = () => {
                     <div
                         class="flex justify-center items-center px-3 py-2 text-black bg-green-600 rounded-md cursor-pointer select-none"
                         onClick={() => joinSwarm()}
-                        onKeyDown={(event) => {
-                            if (event.key.toLowerCase() === "enter") joinSwarm()
-                        }}
                     >
                         Join
                     </div>
