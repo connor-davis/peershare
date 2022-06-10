@@ -47,7 +47,7 @@ const SetupPage = () => {
                         class="px-3 py-2 bg-gray-200 dark:bg-gray-900 rounded-lg text-black dark:text-white outline-none select-none focus:outline-green-500"
                     />
                     <input
-                        type="text"
+                        type="password"
                         name="password"
                         id="password"
                         autoComplete="password"
