@@ -11,17 +11,60 @@
     "prod": "pnpm build && git add . && git commit -m \"Production build\" && git push",
     "electron": "electron .",
     "electron:test": "wait-on http://localhost:3000/ && echo \"Ready\"",
-    "test": "concurrently \"pnpm electron\" \"pnpm dev\" --kill-others --success first"
+    "test": "concurrently \"pnpm electron\" \"pnpm dev\" --kill-others --success first",
+    "copyFiles": "yarn copyBuild && yarn copyBuild",
+    "copyBuild": "copy-files-from-to",
+    "electron-build": "electron-packager ./build --out=dist"
   },
-  "license": "MIT",
+  "repository": "git@github.com:connor-davis/peershare.git",
+  "author": "Connor Davis <cnnrproton@gmail.com>",
+  "copyFiles": [
+    {
+      "from": "electron/**",
+      "to": "build/"
+    },
+    {
+      "from": "build/**/*",
+      "to": "app/build/"
+    }
+  ],
+  "build": {
+    "appId": "software.lone-wolf.peershare",
+    "compression": "maximum",
+    "productName": "PeerShare",
+    "target": "NSIS",
+    "win": {
+      "icon": "./public/icon.png"
+    },
+    "files": [
+      "app/**/*",
+      "app/build/**/*"
+    ],
+    "asar": true,
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false
+    },
+    "directories": {
+      "buildResources": "public"
+    }
+  },
+  "license": "GPL-3.0",
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.1",
     "autoprefixer": "^10.4.2",
+    "concurrently": "^7.2.1",
+    "copyfiles": "^2.4.1",
+    "cross-env": "^7.0.3",
     "electron": "^19.0.1",
+    "electron-builder": "^23.0.3",
+    "electron-devtools-installer": "^3.2.0",
+    "electron-packager": "^15.5.1",
     "postcss": "^8.4.5",
     "tailwindcss": "^3.0.18",
     "vite": "^2.9.9",
-    "vite-plugin-solid": "^2.2.6"
+    "vite-plugin-solid": "^2.2.6",
+    "wait-on": "^6.0.1"
   },
   "dependencies": {
     "@hyperswarm/dht": "^5.0.25",
@@ -32,10 +75,11 @@
     "body-parser": "^1.20.0",
     "chalk": "^5.0.1",
     "compression": "^1.7.4",
-    "concurrently": "^7.2.1",
+    "copy-files-from-to": "^3.2.2",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.1",
+    "electron-updater": "^5.0.1",
     "express": "^4.18.1",
     "express-session": "^1.17.3",
     "file-type": "^17.1.1",
@@ -55,7 +99,6 @@
     "socket.io": "^4.5.1",
     "solid-js": "^1.4.2",
     "solid-transition-group": "^0.0.8",
-    "util": "^0.12.4",
-    "wait-on": "^6.0.1"
+    "util": "^0.12.4"
   }
 }
