@@ -15,6 +15,7 @@ const HomePage = () => {
 
     onMount(() => {
         send("peer-count");
+
         receive("started", (event, data) => {
             if (data.download) {
                 setDownloadsList([...downloadsList.filter((download) => download.file.path !== data.key), {
@@ -27,6 +28,7 @@ const HomePage = () => {
 
                 return setDownloadCount(downloadCount() + 1);
             }
+
             if (data.upload) {
                 setUploadsList([...uploadsList.filter((upload) => upload.file.path !== data.key), {
                     file: filesList.filter((f) => f.path === data.key)[0],
@@ -39,9 +41,8 @@ const HomePage = () => {
                 return setUploadCount(uploadCount() + 1);
             }
         });
-        receive("progress", (event, data) => {
-            console.log(data);
 
+        receive("progress", (event, data) => {
             if (data.download) {
                 return setDownloadsList([...downloadsList.filter((download) => download.file.path !== data.key), {
                     key: data.key,
@@ -62,25 +63,33 @@ const HomePage = () => {
                 }]);
             }
         })
-        receive("complete", (event, data) => {
-            console.log(downloadsList, uploadsList);
 
+        receive("complete", (event, data) => {
             if (data.download) {
                 setDownloadsList(downloadsList.filter((download) => download.file.path !== data.key));
+                setFilesList(filesList.map((file) => {
+                    if (file.path === data.key) return {...file, downloaded: true};
+                    return file;
+                }))
+
                 return setDownloadCount(downloadCount() - 1);
             }
+
             if (data.upload) {
                 setUploadsList(uploadsList.filter((upload) => upload.file.path !== data.key));
+
                 return setUploadCount(uploadCount() - 1);
             }
         })
+
         receive("peer-count", (event, count) => {
             setPeerData({...peerData, peerCount: count});
         });
+
         receive("file-list", (event, data) => {
             let list = [];
 
-            data.forEach((value) => list.push(value));
+            data.forEach((value) => list.push({...value, downloaded: false}));
 
             setFilesList(list)
         });
@@ -115,6 +124,17 @@ const HomePage = () => {
 
     const downloadFile = (path) => {
         send("download-file", path);
+    }
+
+    const deleteFile = (name) => {
+        send("delete-file", name);
+
+        receive("file-deleted", (event, data) => {
+            setFilesList(filesList.map((file) => {
+                if (file.name === data) return {...file, downloaded: false};
+                return file;
+            }))
+        })
     }
 
     return (
@@ -205,11 +225,58 @@ const HomePage = () => {
                         <div class={"flex flex-col space-y-2 p-2"}>
                             {filesList.map((file) => (
                                 <div
-                                    class={"flex justify-between items-center border-b border-gray-800"}>
+                                    class={"flex justify-between items-center border-b border-gray-800 p-2"}>
                                     <div>{file.name}</div>
                                     {file.remote ?
-                                        <div onClick={() => downloadFile(file.path)}>Download</div> :
-                                        <div onClick={() => removeFile(file)}>Remove</div>
+                                        file.downloaded ? (
+                                            <div class={"flex items-center space-x-2"}>
+                                                <div
+                                                    class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
+                                                    title={"View"}
+                                                    onClick={() => send("view-downloads")}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                    </svg>
+                                                </div>
+                                                <div
+                                                    class={"flex items-center space-x-2 w-auto h-auto p-1 bg-red-500 bg-opacity-10 text-red-500 rounded-lg cursor-pointer"}
+                                                    title={"Delete"}
+                                                    onClick={() => deleteFile(file.name)}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+
+                                        ) : (
+                                            <div
+                                                class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
+                                                title={"Download"}
+                                                onClick={() => downloadFile(file.path)}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                                </svg>
+                                            </div>
+                                        )
+                                        :
+                                        <div
+                                            class={"flex items-center space-x-2 w-auto h-auto p-1 bg-red-500 bg-opacity-10 text-red-500 rounded-lg cursor-pointer"}
+                                            title={"Delete"}
+                                            onClick={() => removeFile(file)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </div>
                                     }
                                 </div>
                             ))}

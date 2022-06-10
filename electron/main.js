@@ -1,5 +1,6 @@
-const {app, BrowserWindow, ipcMain} = require('electron');
+const {app, BrowserWindow, ipcMain, shell} = require('electron');
 const path = require('path');
+const {unlinkSync} = require("fs");
 const Protocol = require('../protocol');
 let protocol = new Protocol();
 
@@ -46,8 +47,20 @@ ipcMain.on("remove-file", (event, data) => {
 });
 
 ipcMain.on("download-file", (event, path) => {
-    protocol.events.next({ type: "download-file", key: path });
+    protocol.events.next({type: "download-file", key: path});
 });
+
+ipcMain.on("delete-file", (event, name) => {
+    const filePath = path.join(process.cwd(), "downloads", name);
+
+    unlinkSync(filePath);
+
+    event.reply("file-deleted", name);
+});
+
+ipcMain.on("view-downloads", (event, data) => {
+    shell.openPath(path.join(process.cwd(), "downloads"));
+})
 
 ipcMain.on("peer-count", (event, data) => {
     event.reply("peer-count", protocol.peerCount);
