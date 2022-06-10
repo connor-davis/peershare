@@ -20,7 +20,7 @@ const createMainWindow = () => {
     });
 
     let url = `file://${path.join(__dirname, 'index.html')}`;
-    url = 'http://localhost:3000';
+    // url = 'http://localhost:3000';
 
     win.loadURL(url).then();
 
@@ -35,7 +35,7 @@ const createSplashWindow = () => {
         center: true,
     });
 
-    let url = `file://${path.join(__dirname, "../public", 'splash.html')}`;
+    let url = `file://${path.join(__dirname, 'splash.html')}`;
     // url = 'http://localhost:3000';
 
     win.loadURL(url).then();
