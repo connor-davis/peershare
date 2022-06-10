@@ -1,7 +1,7 @@
 const {app, BrowserWindow, ipcMain, shell} = require('electron');
 const path = require('path');
 const {unlinkSync} = require("fs");
-const Protocol = require('../protocol');
+const Protocol = require('./protocol');
 let protocol = new Protocol();
 
 const createWindow = () => {
@@ -14,8 +14,8 @@ const createWindow = () => {
         },
     });
 
-    // let url = `file://${path.join(process.cwd(), 'dist', 'index.html')}`;
-    let url = 'http://localhost:3000';
+    let url = `file://${path.join(__dirname, 'index.html')}`;
+    // url = 'http://localhost:3000';
 
     win.loadURL(url).then();
 };
@@ -58,11 +58,11 @@ ipcMain.on("delete-file", (event, name) => {
     event.reply("file-deleted", name);
 });
 
-ipcMain.on("view-downloads", (event, data) => {
-    shell.openPath(path.join(process.cwd(), "downloads"));
+ipcMain.on("view-downloads", () => {
+    shell.openPath(path.join(process.cwd(), "downloads")).then();
 })
 
-ipcMain.on("peer-count", (event, data) => {
+ipcMain.on("peer-count", (event, _) => {
     event.reply("peer-count", protocol.peerCount);
 });
 
@@ -80,7 +80,7 @@ ipcMain.on("connect-swarm", async (event, data) => {
     });
 });
 
-ipcMain.on("disconnect-swarm", (event, data) => {
+ipcMain.on("disconnect-swarm", (event, _) => {
     protocol.killSwarm().then(() => {
         event.reply("swarm-disconnected");
 

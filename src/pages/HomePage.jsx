@@ -44,29 +44,40 @@ const HomePage = () => {
 
         receive("progress", (event, data) => {
             if (data.download) {
-                return setDownloadsList([...downloadsList.filter((download) => download.file.path !== data.key), {
-                    key: data.key,
-                    file: filesList.filter((f) => f.path === data.key)[0],
-                    progress: data.download.progress,
-                    speed: data.download.speed,
-                    eta: data.download.eta
-                }]);
+                return setDownloadsList([
+                    ...downloadsList.map((download) => {
+                        if (download.key === data.key) return {
+                            key: data.key,
+                            file: filesList.filter((f) => f.path === data.key)[0],
+                            progress: data.download.progress,
+                            speed: formatBytes(data.download.speed),
+                            eta: data.download.eta
+                        }
+                        else return download
+                    })
+                ]);
             }
 
             if (data.upload) {
-                return setUploadsList([...uploadsList.filter((upload) => upload.file.path !== data.key), {
-                    key: data.key,
-                    file: filesList.filter((f) => f.path === data.key)[0],
-                    progress: data.upload.progress,
-                    speed: data.upload.speed,
-                    eta: data.upload.eta
-                }]);
+                return setUploadsList([
+                    ...uploadsList.map((upload) => {
+                        if (upload.key === data.key) return {
+                            key: data.key,
+                            file: filesList.filter((f) => f.path === data.key)[0],
+                            progress: data.upload.progress,
+                            speed: formatBytes(data.upload.speed),
+                            eta: data.upload.eta
+                        }
+                        else return upload;
+                    })
+                ]);
             }
         })
 
         receive("complete", (event, data) => {
             if (data.download) {
                 setDownloadsList(downloadsList.filter((download) => download.file.path !== data.key));
+
                 setFilesList(filesList.map((file) => {
                     if (file.path === data.key) return {...file, downloaded: true};
                     return file;
@@ -93,7 +104,19 @@ const HomePage = () => {
 
             setFilesList(list)
         });
-    })
+    });
+
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
 
     const disconnectSwarm = () => {
         send("disconnect-swarm");
@@ -208,7 +231,7 @@ const HomePage = () => {
                                                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                                 </svg>
                                             </div>
-                                            <div class={"text-sm"}>{downloadCount()}</div>
+                                            <div class={"text-sm"}>{downloadsList.length}</div>
                                         </div>
                                         <div
                                             class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
@@ -220,7 +243,7 @@ const HomePage = () => {
                                                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                                                 </svg>
                                             </div>
-                                            <div class={"text-sm"}>{uploadCount()}</div>
+                                            <div class={"text-sm"}>{uploadsList.length}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -307,9 +330,9 @@ const HomePage = () => {
                                         <div class={"flex flex-col space-y-2 p-2 border-b border-gray-800"}>
                                             <div class={"flex justify-between items-center"}>
                                                 <div>{download.file.name}</div>
-                                                <div class={"flex items-center space-x-2"}>
+                                                <div class={"flex items-center space-x-2 text-green-500"}>
                                                     <div>{download.eta} s</div>
-                                                    <div>{download.speed} b/s</div>
+                                                    <div>{download.speed + `\\s`}</div>
                                                 </div>
                                             </div>
                                             <div class={"w-full h-2 rounded-full bg-gray-800"}>
@@ -329,17 +352,17 @@ const HomePage = () => {
                             </div>
                             <div class={"w-full h-full border-l border-black p-2 pb-12"}>
                                 <div class={"w-full h-full overflow-y-auto"}>
-                                    {downloadsList.map((download) => (
+                                    {uploadsList.map((upload) => (
                                         <div class={"flex flex-col space-y-2 p-2 border-b border-gray-800"}>
                                             <div class={"flex justify-between items-center"}>
-                                                <div>{download.file.name}</div>
-                                                <div class={"flex items-center space-x-2"}>
-                                                    <div>{download.eta} s</div>
-                                                    <div>{download.speed} b/s</div>
+                                                <div>{upload.file.name}</div>
+                                                <div class={"flex items-center space-x-2 text-green-500"}>
+                                                    <div>{upload.eta} s</div>
+                                                    <div>{upload.speed + `\\s`}</div>
                                                 </div>
                                             </div>
                                             <div class={"w-full h-2 rounded-full bg-gray-800"}>
-                                                <div style={{width: download.progress + "%"}}
+                                                <div style={{width: upload.progress + "%"}}
                                                      class={`h-full rounded-full bg-green-500`}></div>
                                             </div>
                                         </div>

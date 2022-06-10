@@ -48,6 +48,9 @@ const SetupPage = () => {
                     <div
                         class="flex justify-center items-center px-3 py-2 text-black bg-green-600 rounded-md cursor-pointer select-none"
                         onClick={() => joinSwarm()}
+                        onKeyDown={(event) => {
+                            if (event.key.toLowerCase() === "enter") joinSwarm()
+                        }}
                     >
                         Join
                     </div>

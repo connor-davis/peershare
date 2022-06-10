@@ -2,29 +2,33 @@
   "name": "peer-share",
   "version": "0.0.1",
   "description": "Share your files and ports with peer to peer technologies.",
-  "main": "electron/main.js",
+  "main": "app/build/main.js",
   "scripts": {
     "start": "vite",
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "vite build && pnpm copyFiles",
     "serve": "vite preview",
     "prod": "pnpm build && git add . && git commit -m \"Production build\" && git push",
-    "electron": "electron .",
+    "electron": "electron ./electron/main.js",
     "electron:test": "wait-on http://localhost:3000/ && echo \"Ready\"",
     "test": "concurrently \"pnpm electron\" \"pnpm dev\" --kill-others --success first",
-    "copyFiles": "yarn copyBuild && yarn copyBuild",
+    "copyFiles": "pnpm copyBuild && pnpm copyBuild",
     "copyBuild": "copy-files-from-to",
-    "electron-build": "electron-packager ./build --out=dist"
+    "electron-build": "electron-packager ./build --out=dist",
+    "pack": "electron-builder --dir",
+    "distWin": "electron-builder --win --x64 && electron-builder install-app-deps",
+    "distLinux": "electron-builder --linux --x64",
+    "gh-publish-win": "pnpm build && electron-builder install-app-deps && electron-builder --win --x64 -p always"
   },
   "repository": "git@github.com:connor-davis/peershare.git",
   "author": "Connor Davis <cnnrproton@gmail.com>",
   "copyFiles": [
     {
-      "from": "electron/**",
-      "to": "build/"
+      "from": "dist/**/*",
+      "to": "app/build/"
     },
     {
-      "from": "build/**/*",
+      "from": "electron/**/*",
       "to": "app/build/"
     }
   ],
@@ -37,8 +41,7 @@
       "icon": "./public/icon.png"
     },
     "files": [
-      "app/**/*",
-      "app/build/**/*"
+      "app/**/**/*"
     ],
     "asar": true,
     "nsis": {
@@ -54,7 +57,6 @@
     "@tailwindcss/typography": "^0.5.1",
     "autoprefixer": "^10.4.2",
     "concurrently": "^7.2.1",
-    "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "electron": "^19.0.1",
     "electron-builder": "^23.0.3",
@@ -70,30 +72,14 @@
     "@hyperswarm/dht": "^5.0.25",
     "@rturnq/solid-router": "^0.3.0",
     "@telios/nebula": "^2.5.8",
-    "axios": "^0.27.2",
-    "bcrypt": "^5.0.1",
-    "body-parser": "^1.20.0",
-    "chalk": "^5.0.1",
-    "compression": "^1.7.4",
-    "copy-files-from-to": "^3.2.2",
-    "cors": "^2.8.5",
-    "crypto-js": "^4.1.1",
     "dotenv": "^16.0.1",
     "electron-updater": "^5.0.1",
-    "express": "^4.18.1",
-    "express-session": "^1.17.3",
     "file-type": "^17.1.1",
     "hypercore-crypto": "^3.2.1",
     "hyperdrive": "^10.21.0",
     "hyperswarm": "^3.0.4",
-    "jsonwebtoken": "^8.5.1",
-    "level": "^8.0.0",
     "mime-types": "^2.1.35",
-    "moment": "^2.29.3",
-    "passport": "^0.6.0",
-    "passport-jwt": "^4.0.0",
     "portfinder": "^1.0.28",
-    "pouchdb": "^7.3.0",
     "progress-stream": "^2.0.0",
     "rxjs": "^7.5.5",
     "socket.io": "^4.5.1",

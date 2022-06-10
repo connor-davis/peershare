@@ -4,3 +4,6 @@ node_modules
 ssl
 certs
 downloads
+dist
+app
+build
