@@ -73,6 +73,7 @@
     "@hyperswarm/dht": "^5.0.25",
     "@rturnq/solid-router": "^0.3.0",
     "@telios/nebula": "^2.5.8",
+    "copy-files-from-to": "^3.2.2",
     "dotenv": "^16.0.1",
     "electron-updater": "^5.0.1",
     "file-type": "^17.1.1",
