@@ -146,17 +146,6 @@ const HomePage = () => {
                 </div>
             </div>}
 
-            {peerData.peerCount === 0 && (
-                <div class={"absolute w-full h-full flex flex-col justify-center items-center"}>
-                    <div class={"w-full h-full bg-black opacity-20"}></div>
-                    <div class={"absolute flex space-x-2 justify-center items-center w-full h-full"}>
-                        <div>Waiting for a peer to join...</div>
-                        <div
-                            class={"animate-spin w-5 h-5 border-l border-t border-green-500 border-1 rounded-full"}></div>
-                    </div>
-                </div>
-            )}
-
             {!leaving() && <>
                 <div class={"flex flex-col w-full h-auto"}>
                     <div class={"flex justify-between items-center p-2 border-b border-black"}>
@@ -186,106 +175,178 @@ const HomePage = () => {
                         </div>
                     </div>
                 </div>
-                <div class={"flex w-full h-full"}>
-                    <div class={"flex flex-col w-full h-full border-t border-gray-800"}>
-                        <div class={"flex w-full border-b border-gray-800"}>
-                            <div class={"flex w-full justify-between items-center p-2 border-b border-black"}>
-                                <div class={"flex items-center space-x-2"}>
-                                    <div class={"text-md text-gray-400 cursor-pointer"} onClick={() => addFile()}>Add
-                                    </div>
-                                </div>
-                                <div class={"flex items-center space-x-2"}>
-                                    <div
-                                        class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
-                                        title={"Downloads"}>
-                                        <div>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                            </svg>
-                                        </div>
-                                        <div class={"text-sm"}>{downloadCount()}</div>
-                                    </div>
-                                    <div
-                                        class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
-                                        title={"Uploads"}>
-                                        <div>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                            </svg>
-                                        </div>
-                                        <div class={"text-sm"}>{uploadCount()}</div>
-                                    </div>
-                                </div>
+                <div class={"relative flex flex-col w-full h-full"}>
+                    {peerData.peerCount === 0 && (
+                        <div class={"absolute w-full h-full flex flex-col justify-center items-center"}>
+                            <div class={"w-full h-full bg-black opacity-20"}></div>
+                            <div class={"absolute flex space-x-2 justify-center items-center w-full h-full"}>
+                                <div>Waiting for a peer to join...</div>
+                                <div
+                                    class={"animate-spin w-5 h-5 border-l border-t border-green-500 border-1 rounded-full"}></div>
                             </div>
                         </div>
-                        <div class={"flex flex-col space-y-2 p-2"}>
-                            {filesList.map((file) => (
-                                <div
-                                    class={"flex justify-between items-center border-b border-gray-800 p-2"}>
-                                    <div>{file.name}</div>
-                                    {file.remote ?
-                                        file.downloaded ? (
-                                            <div class={"flex items-center space-x-2"}>
-                                                <div
-                                                    class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
-                                                    title={"View"}
-                                                    onClick={() => send("view-downloads")}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                                    </svg>
-                                                </div>
-                                                <div
-                                                    class={"flex items-center space-x-2 w-auto h-auto p-1 bg-red-500 bg-opacity-10 text-red-500 rounded-lg cursor-pointer"}
-                                                    title={"Delete"}
-                                                    onClick={() => deleteFile(file.name)}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                    </svg>
-                                                </div>
-                                            </div>
+                    )}
 
-                                        ) : (
-                                            <div
-                                                class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
-                                                title={"Download"}
-                                                onClick={() => downloadFile(file.path)}>
+                    <div class={"flex w-full h-3/5 border-b border-black"}>
+                        <div class={"flex flex-col w-full h-full border-t border-gray-800"}>
+                            <div class={"flex w-full border-b border-gray-800"}>
+                                <div class={"flex w-full justify-between items-center p-2 border-b border-black"}>
+                                    <div class={"flex items-center space-x-2"}>
+                                        <div class={"text-md text-green-500 cursor-pointer"}
+                                             onClick={() => addFile()}>
+                                            Add File
+                                        </div>
+                                    </div>
+                                    <div class={"flex items-center space-x-2"}>
+                                        <div
+                                            class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
+                                            title={"Downloads"}>
+                                            <div>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                      viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                                 </svg>
                                             </div>
-                                        )
-                                        :
-                                        <div
-                                            class={"flex items-center space-x-2 w-auto h-auto p-1 bg-red-500 bg-opacity-10 text-red-500 rounded-lg cursor-pointer"}
-                                            title={"Delete"}
-                                            onClick={() => removeFile(file)}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
+                                            <div class={"text-sm"}>{downloadCount()}</div>
                                         </div>
-                                    }
+                                        <div
+                                            class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
+                                            title={"Uploads"}>
+                                            <div>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                                </svg>
+                                            </div>
+                                            <div class={"text-sm"}>{uploadCount()}</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            ))}
+                            </div>
+                            <div class={"flex flex-col space-y-2 p-2"}>
+                                {filesList.map((file) => (
+                                    <div
+                                        class={"flex justify-between items-center border-b border-gray-800 p-2"}>
+                                        <div>{file.name}</div>
+                                        {file.remote ?
+                                            file.downloaded ? (
+                                                <div class={"flex items-center space-x-2"}>
+                                                    <div
+                                                        class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
+                                                        title={"View"}
+                                                        onClick={() => send("view-downloads")}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                                                             fill="none"
+                                                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div
+                                                        class={"flex items-center space-x-2 w-auto h-auto p-1 bg-red-500 bg-opacity-10 text-red-500 rounded-lg cursor-pointer"}
+                                                        title={"Delete"}
+                                                        onClick={() => deleteFile(file.name)}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                                                             fill="none"
+                                                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+
+                                            ) : (
+                                                <div
+                                                    class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
+                                                    title={"Download"}
+                                                    onClick={() => downloadFile(file.path)}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                                    </svg>
+                                                </div>
+                                            )
+                                            :
+                                            <div
+                                                class={"flex items-center space-x-2 w-auto h-auto p-1 bg-red-500 bg-opacity-10 text-red-500 rounded-lg cursor-pointer"}
+                                                title={"Delete"}
+                                                onClick={() => removeFile(file)}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </div>
+                                        }
+                                    </div>
+                                ))}
+                            </div>
                         </div>
+
+                        {/*<div class={"w-2/5  h-full border-l border-gray-800"}>*/}
+                        {/*    <div*/}
+                        {/*        class={"flex flex-col w-full h-full border-l border-t border-t-gray-800 border-black"}></div>*/}
+                        {/*</div>*/}
                     </div>
 
-                    <div class={"w-2/5  h-full border-l border-gray-800"}>
-                        <div
-                            class={"flex flex-col w-full h-full border-l border-t border-t-gray-800 border-black"}></div>
+                    <div class={"flex w-full h-2/5"}>
+                        <div class={"flex flex-col w-full h-full border-t border-t-gray-800"}>
+                            <div class={"w-full h-auto border-b border-r border-gray-800"}>
+                                <div
+                                    class={"flex items-center w-full h-auto p-2 border-b border-black text-green-500"}>Downloads
+                                </div>
+                            </div>
+                            <div class={"w-full h-full border-r border-gray-800 p-2 pb-12"}>
+                                <div class={"w-full h-full overflow-y-auto"}>
+                                    {downloadsList.map((download) => (
+                                        <div class={"flex flex-col space-y-2 p-2 border-b border-gray-800"}>
+                                            <div class={"flex justify-between items-center"}>
+                                                <div>{download.file.name}</div>
+                                                <div class={"flex items-center space-x-2"}>
+                                                    <div>{download.eta} s</div>
+                                                    <div>{download.speed} b/s</div>
+                                                </div>
+                                            </div>
+                                            <div class={"w-full h-2 rounded-full bg-gray-800"}>
+                                                <div style={{width: download.progress + "%"}}
+                                                     class={`h-full rounded-full bg-green-500`}></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div class={"flex flex-col w-full h-full border-t border-t-gray-800"}>
+                            <div class={"w-full h-auto border-b border-gray-800 border-l border-l-black"}>
+                                <div
+                                    class={"flex items-center w-full h-auto p-2 border-b border-black text-green-500"}>Uploads
+                                </div>
+                            </div>
+                            <div class={"w-full h-full border-l border-black p-2 pb-12"}>
+                                <div class={"w-full h-full overflow-y-auto"}>
+                                    {downloadsList.map((download) => (
+                                        <div class={"flex flex-col space-y-2 p-2 border-b border-gray-800"}>
+                                            <div class={"flex justify-between items-center"}>
+                                                <div>{download.file.name}</div>
+                                                <div class={"flex items-center space-x-2"}>
+                                                    <div>{download.eta} s</div>
+                                                    <div>{download.speed} b/s</div>
+                                                </div>
+                                            </div>
+                                            <div class={"w-full h-2 rounded-full bg-gray-800"}>
+                                                <div style={{width: download.progress + "%"}}
+                                                     class={`h-full rounded-full bg-green-500`}></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </>}
