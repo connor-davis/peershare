@@ -16,8 +16,9 @@
     "copyBuild": "copy-files-from-to",
     "electron-build": "electron-packager ./build --out=dist",
     "pack": "electron-builder --dir",
-    "distWin": "electron-builder --win --x64 && electron-builder install-app-deps",
+    "distWin": "electron-builder --win --x64",
     "distLinux": "electron-builder --linux --x64",
+    "distMac": "electron-builder --osx --x64",
     "gh-publish-win": "pnpm build && electron-builder install-app-deps && electron-builder --win --x64 -p always"
   },
   "repository": "git@github.com:connor-davis/peershare.git",
