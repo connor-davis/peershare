@@ -23,6 +23,9 @@ jobs:
       - name: NPM Build
         run: npm run build
 
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+
       - name: Distribute and Publish
         env:
           GH_TOKEN: ${{secrets.GH_TOKEN}}
