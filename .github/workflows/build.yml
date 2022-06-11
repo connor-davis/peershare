@@ -18,13 +18,10 @@ jobs:
           node-version: 16
 
       - name: NPM Install
-        with:
-          arguments: npm install
+        run: npm install
 
       - name: Distribute and Publish
-        with:
-          arguments: npm run dist-win
+        run: npm run distWin
 
       - name: View
-        with:
-          arguments: ls
+        run: ls
