@@ -5,35 +5,6 @@ on:
     branches: [ master ]
 
 jobs:
-  release-linux:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: NPM Install
-        run: npm install
-
-      - name: NPM Build
-        run: npm run build
-
-      - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1
-
-      - name: Distribute and Publish
-        env:
-          GH_TOKEN: ${{secrets.GH_TOKEN}}
-        run: npm run distLinux
-
-      - name: View
-        run: ls
-
   release-win:
     runs-on: windows-latest
 
