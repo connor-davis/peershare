@@ -19,7 +19,7 @@
     "distWin": "electron-builder --win --x64",
     "distLinux": "electron-builder --linux --x64",
     "distMac": "electron-builder --osx --x64",
-    "gh-publish-win": "npm run build && electron-builder --win --x64 -p always"
+    "gh-publish": "npm run build && electron-builder --x64 -p always"
   },
   "repository": "git@github.com:connor-davis/peershare.git",
   "author": "Connor Davis <cnnrproton@gmail.com>",

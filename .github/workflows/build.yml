@@ -1,35 +1,28 @@
-name: CI
-on:
-  push:
-    branches:
-      - master
+name: Build/release
+
+on: push
+
 jobs:
-  build:
-    runs-on: [macos-latest, ubuntu-latest, windows-latest]
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
     steps:
-    - uses: actions/checkout@master
-      with:
-        ref: master
-    - uses: actions/setup-node@master
-      with:
-        node-version: 16
-    - name: see directory in electron_dist
-      run: ls ./electron
-    - name: electron mac os security identities
-      run: security find-identity -v
-    - name: Install dependencies
-      run: npm install
-    - name: Build on MacOS
-      env:
-        ELECTRON: true
-        APP_VERSION_NUMBER: 0.0.2
-      run: npm run build
-    - name: Build Electron
-      env:
-        ELECTRON: true
-        APP_VERSION_NUMBER: 0.0.2
-      run: npm run distMac
-    - name: see directory
-      run: ls
-    - name: see directory in electron_dist
-      run: ls ./dist
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: NPM Install
+        with:
+          arguments: npm install
+
+      - name: Distribute and Publish
+        with:
+          arguments: npm run gh-publish
