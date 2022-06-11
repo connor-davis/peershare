@@ -1,14 +1,12 @@
 name: Build/release
 
-on: push
+on:
+  push:
+    branches: [ master ]
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+  release-win:
+    runs-on: windows-latest
 
     steps:
       - name: Check out Git repository
@@ -25,4 +23,8 @@ jobs:
 
       - name: Distribute and Publish
         with:
-          arguments: npm run gh-publish
+          arguments: npm run dist-win
+
+      - name: View
+        with:
+          arguments: ls
