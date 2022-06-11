@@ -24,6 +24,8 @@ jobs:
         run: npm run build
 
       - name: Distribute and Publish
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN}}
         run: npm run distLinux
 
       - name: View
@@ -48,6 +50,8 @@ jobs:
         run: npm run build
 
       - name: Distribute and Publish
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN}}
         run: npm run distWin
 
       - name: View
@@ -72,6 +76,8 @@ jobs:
         run: npm run build
 
       - name: Distribute and Publish
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN}}
         run: npm run distMac
 
       - name: View
