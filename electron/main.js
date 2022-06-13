@@ -1,3 +1,8 @@
+"use strict";
+
+const dotenv = require("dotenv");
+dotenv.config();
+
 const {app, BrowserWindow, ipcMain, shell} = require('electron');
 const path = require('path');
 const {unlinkSync} = require("fs");
@@ -20,8 +25,7 @@ const createMainWindow = () => {
         },
     });
 
-    let url = `file://${path.join(__dirname, 'index.html')}`;
-    url = 'http://localhost:3000';
+    let url = !process.env.DEV ? `file://${path.join(__dirname, 'index.html')}` : 'http://localhost:3000';
 
     win.loadURL(url).then();
 
@@ -37,8 +41,7 @@ const createSplashWindow = () => {
         transparent: true
     });
 
-    let url = `file://${path.join(__dirname, 'splash.html')}`;
-    url = `file://${path.join(__dirname, '../public', 'splash.html')}`;
+    let url = !process.env.DEV ? `file://${path.join(__dirname, 'splash.html')}` : `file://${path.join(__dirname, '../public', 'splash.html')}`;
 
     win.loadURL(url).then();
 
