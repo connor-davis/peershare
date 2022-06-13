@@ -1,0 +1,11 @@
+{
+  "appId": "software.lonewolf.peershare",
+  "appName": "PeerShare",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "NodeJS": {
+      "nodeDir": "nodejs"
+    }
+  }
+}

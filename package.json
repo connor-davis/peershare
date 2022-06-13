@@ -54,6 +54,7 @@
   },
   "license": "GPL-3.0",
   "devDependencies": {
+    "@capacitor/cli": "^3.5.1",
     "@tailwindcss/typography": "^0.5.1",
     "autoprefixer": "^10.4.2",
     "concurrently": "^7.2.1",
@@ -69,9 +70,12 @@
     "wait-on": "^6.0.1"
   },
   "dependencies": {
+    "@capacitor/android": "^3.5.1",
+    "@capacitor/core": "^3.5.1",
     "@hyperswarm/dht": "^5.0.25",
     "@rturnq/solid-router": "^0.3.0",
     "@telios/nebula": "^2.5.8",
+    "capacitor-nodejs": "github:hampoelz/capacitor-nodejs",
     "copy-files-from-to": "^3.2.2",
     "dotenv": "^16.0.1",
     "electron-updater": "^5.0.1",
