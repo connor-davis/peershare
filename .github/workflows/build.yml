@@ -2,7 +2,7 @@ name: Build/release
 
 on:
   pull_request:
-    branches: [ master ]
+    types: [closed]
 
 jobs:
   release-win:
