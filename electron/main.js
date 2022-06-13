@@ -13,6 +13,7 @@ const createMainWindow = () => {
         show: false,
         frame: false,
         center: true,
+        transparent: true,
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, 'preload.js'),
@@ -33,6 +34,7 @@ const createSplashWindow = () => {
         height: 240,
         frame: false,
         center: true,
+        transparent: true
     });
 
     let url = `file://${path.join(__dirname, 'splash.html')}`;
