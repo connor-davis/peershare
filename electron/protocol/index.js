@@ -164,8 +164,6 @@ class Protocol {
 
     async killSwarm() {
         return new Promise(async (resolve, reject) => {
-            console.log(this.topic);
-
             this.connections.forEach((connection) => connection.write(JSON.stringify({type: "disconnect"})));
 
             await this.swarm.leave(this.topic);

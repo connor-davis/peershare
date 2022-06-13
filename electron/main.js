@@ -20,7 +20,7 @@ const createMainWindow = () => {
     });
 
     let url = `file://${path.join(__dirname, 'index.html')}`;
-    // url = 'http://localhost:3000';
+    url = 'http://localhost:3000';
 
     win.loadURL(url).then();
 
@@ -36,7 +36,7 @@ const createSplashWindow = () => {
     });
 
     let url = `file://${path.join(__dirname, 'splash.html')}`;
-    // url = 'http://localhost:3000';
+    url = `file://${path.join(__dirname, '../public', 'splash.html')}`;
 
     win.loadURL(url).then();
 
@@ -68,7 +68,9 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+    protocol.killSwarm().then(() => {
+        if (process.platform !== 'darwin') app.quit();
+    });
 });
 
 ipcMain.on("minimizeWindow", (_, __) => {
