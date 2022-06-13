@@ -199,9 +199,9 @@ const HomePage = () => {
                     </div>
                 </div>
                 <div class={"relative flex flex-col w-full h-full"}>
-                    {peerData.peerCount === 0 && (
+                    {peerData.peerCount > 0 && (
                         <div class={"absolute w-full h-full flex flex-col justify-center items-center"}>
-                            <div class={"w-full h-full bg-black opacity-20"}></div>
+                            <div class={"w-full h-full bg-black opacity-20 rounded-b-lg"}></div>
                             <div class={"absolute flex space-x-2 justify-center items-center w-full h-full"}>
                                 <div>Waiting for a peer to join...</div>
                                 <div
@@ -252,11 +252,13 @@ const HomePage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div class={"flex flex-col space-y-2 p-2"}>
+                            <div class={"flex flex-col space-y-2 p-2 overflow-y-auto"}>
                                 {filesList.map((file) => (
                                     <div
                                         class={"flex justify-between items-center border-b border-gray-800 p-2"}>
-                                        <div>{file.name}</div>
+                                        <div class={"w-2/5"}>{file.name}</div>
+                                        <div class={"w-1/5"}>{file.type}</div>
+                                        <div class={"w-1/5"}>{formatBytes(file.size)}</div>
                                         {file.remote ?
                                             file.downloaded ? (
                                                 <div class={"flex items-center space-x-2"}>
@@ -323,12 +325,12 @@ const HomePage = () => {
 
                     <div class={"flex w-full h-2/5"}>
                         <div class={"flex flex-col w-full h-full border-t border-t-gray-800"}>
-                            <div class={"w-full h-auto border-b border-r border-gray-800"}>
+                            <div class={"w-full h-auto border-b border-r border-gray-800 border-r-black"}>
                                 <div
                                     class={"flex items-center w-full h-auto p-2 border-b border-black text-green-500"}>Downloads
                                 </div>
                             </div>
-                            <div class={"w-full h-full border-r border-gray-800 p-2 pb-12"}>
+                            <div class={"w-full h-full border-r border-black p-2 pb-12"}>
                                 <div class={"w-full h-full overflow-y-auto"}>
                                     {downloadsList.map((download) => (
                                         <div class={"flex flex-col space-y-2 p-2 border-b border-gray-800"}>
@@ -349,12 +351,12 @@ const HomePage = () => {
                             </div>
                         </div>
                         <div class={"flex flex-col w-full h-full border-t border-t-gray-800"}>
-                            <div class={"w-full h-auto border-b border-gray-800 border-l border-l-black"}>
+                            <div class={"w-full h-auto border-b border-gray-800 border-l border-l-gray-800"}>
                                 <div
                                     class={"flex items-center w-full h-auto p-2 border-b border-black text-green-500"}>Uploads
                                 </div>
                             </div>
-                            <div class={"w-full h-full border-l border-black p-2 pb-12"}>
+                            <div class={"w-full h-full border-l border-gray-800 p-2 pb-12"}>
                                 <div class={"w-full h-full overflow-y-auto"}>
                                     {uploadsList.map((upload) => (
                                         <div class={"flex flex-col space-y-2 p-2 border-b border-gray-800"}>

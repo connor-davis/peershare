@@ -7,12 +7,12 @@ import MaximizeIcon from "./components/icons/MaximizeIcon";
 
 function App() {
     return (
-        <div class="dark">
+        <div class="dark rounded-lg">
             <div
-                class="flex flex-col w-screen h-screen text-black bg-white dark:text-white dark:bg-gray-900">
-                <div class={"flex justify-between items-center w-full bg-gray-900"}>
+                class="flex flex-col w-screen h-screen text-black bg-white dark:text-white dark:bg-gray-900 rounded-lg">
+                <div class={"flex justify-between items-center w-full bg-gray-800 rounded-t-lg"} style={{"-webkit-app-region": "drag"}}>
                     <div></div>
-                    <div class={"flex items-center bg-gray-800"}>
+                    <div class={"flex items-center"}  style={{"-webkit-app-region": "no-drag"}}>
                         <div
                             class={"flex flex-col w-6 h-6 justify-center items-center p-2 hover:bg-gray-700 cursor-pointer"}
                         onClick={() => {
@@ -27,7 +27,7 @@ function App() {
                             <MaximizeIcon/>
                         </div>
                         <div
-                            class={"flex flex-col w-6 h-6 justify-center items-center p-2 hover:bg-red-500 cursor-pointer"}onClick={() => {
+                            class={"flex flex-col w-6 h-6 justify-center items-center p-2 hover:bg-red-500 cursor-pointer rounded-tr-lg"}onClick={() => {
                             send("closeWindow")
                         }}>
                             <CloseIcon/>
