@@ -199,7 +199,7 @@ const HomePage = () => {
                     </div>
                 </div>
                 <div class={"relative flex flex-col w-full h-full"}>
-                    {peerData.peerCount > 0 && (
+                    {peerData.peerCount === 0 && (
                         <div class={"absolute w-full h-full flex flex-col justify-center items-center"}>
                             <div class={"w-full h-full bg-black opacity-20 rounded-b-lg"}></div>
                             <div class={"absolute flex space-x-2 justify-center items-center w-full h-full"}>
