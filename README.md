@@ -1,34 +1,25 @@
-## Usage
+# PeerShare
+PeerShare enables you to share files to your friends, family, colleagues etc, using peer-to-peer technology. With a clean, easy to read interface, you can share your files right away.
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
+#### Installation
+##### Manual Build
 
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
+1. Clone this repository.
+2. Navigate to "PeerShare".
+3. Open terminal of choice.
+4. Type "npm install"
+5. Type "npm run build"
+6. Type "npm run distWin/distLinux/distMac" depending on your os.
+7. Wait for it to build.
+8. Navigate to "PeerShare/dist".
+9. Run the installer and follow the prompts.
+10. You're done and can start using the app.
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+##### Already built installer
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+1. Navigate to "Releases" on this repository.
+2. Download the latest version.
+3. Run the installer and follow the prompts.
+4. You're done and can start using the app.
 
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm dev` or `npm start`
-
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br>
-
-### `npm run build`
-
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-## Deployment
-
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+Feel free to contact me via `lupiiin#1594` or join the (Discord Server)[https://discord.gg/U8sYVMts4W]
