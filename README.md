@@ -22,4 +22,4 @@ PeerShare enables you to share files to your friends, family, colleagues etc, us
 3. Run the installer and follow the prompts.
 4. You're done and can start using the app.
 
-Feel free to contact me via `lupiiin#1594` or join the (Discord Server)[https://discord.gg/U8sYVMts4W]
+Feel free to contact me via `lupiiin#1594` or join the [Discord Server](https://discord.gg/U8sYVMts4W)
