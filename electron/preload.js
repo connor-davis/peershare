@@ -6,6 +6,9 @@ contextBridge.exposeInMainWorld('send', (event, data) => {
 );
 contextBridge.exposeInMainWorld('receive', (event, listener) => {
         ipcRenderer.on(event, listener);
+        ipcRenderer.on("**", (event, data) => {
+            console.log(event, data);
+        })
     }
 );
 

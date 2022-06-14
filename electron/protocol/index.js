@@ -9,6 +9,7 @@ class Protocol {
         this.reply = reply;
         this.peerCount = 0;
         this.connections = [];
+        this.messages = [];
         this.files = new Set([]);
         this.events = new Subject();
     }
@@ -52,6 +53,16 @@ class Protocol {
             );
 
             this.events.subscribe((event) => {
+                if (event.type === "local-message") {
+                    reply("message", {type: "local-message", content: event.content});
+                    connection.write(JSON.stringify({type: "remote-message", content: event.content}));
+                }
+
+                if (event.type === "remote-message") {
+                    this.messages.push({ type: "remote-message", content: event.content });
+                    reply("message", {type: "remote-message", content: event.content});
+                }
+
                 if (event.type === "disconnect") {
                     if (this.peerCount === 0) {
                         this.files = new Set([]);
@@ -176,6 +187,15 @@ class Protocol {
 
             resolve(this.peerCount);
         });
+    }
+
+    sendMessage(message) {
+        this.messages.push({ type: "local-message", content: message });
+        this.events.next({type: "local-message", content: message});
+    }
+
+    getMessages() {
+        return this.messages;
     }
 
     addFile(file, forRemote = true, reply = (event, data) => {

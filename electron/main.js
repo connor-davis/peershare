@@ -78,6 +78,12 @@ app.on('window-all-closed', () => {
     });
 });
 
+ipcMain.on("get-messages", (event, _) => event.reply("messages", protocol.getMessages()));
+
+ipcMain.on("message", (event, data) => {
+    protocol.sendMessage(data);
+});
+
 ipcMain.on("minimizeWindow", (_, __) => {
     mainWindow.minimize();
 });
