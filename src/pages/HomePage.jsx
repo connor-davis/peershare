@@ -12,9 +12,12 @@ const HomePage = () => {
     let [downloadsList, setDownloadsList] = createStore([], {name: "downloads-list"});
     let [uploadCount, setUploadCount] = createSignal(0);
     let [uploadsList, setUploadsList] = createStore([], {name: "uploads-list"});
+    let [messages, setMessages] = createStore([], {name: "messages-list"});
+    let [message, setMessage] = createSignal("");
 
     onMount(() => {
         send("peer-count");
+        send("get-messages");
 
         receive("started", (event, data) => {
             if (data.download) {
@@ -97,6 +100,22 @@ const HomePage = () => {
             setPeerData({...peerData, peerCount: count});
         });
 
+        receive("messages", (event, data) => {
+            setMessages([...data]);
+
+            let messagesBox = document.getElementById("messagesBox");
+
+            messagesBox.scrollTop = messagesBox.scrollHeight + 100;
+        });
+
+        receive("message", (event, data) => {
+            setMessages([...messages, data]);
+
+            let messagesBox = document.getElementById("messagesBox");
+
+            messagesBox.scrollTop = messagesBox.scrollHeight + 100;
+        })
+
         receive("file-list", (event, data) => {
             let list = [];
 
@@ -106,7 +125,11 @@ const HomePage = () => {
         });
     });
 
-    function formatBytes(bytes, decimals = 2) {
+    const sendMessage = () => {
+        send("message", message())
+    };
+
+    const formatBytes = (bytes, decimals = 2) => {
         if (bytes === 0) return '0 Bytes';
 
         const k = 1024;
@@ -211,16 +234,19 @@ const HomePage = () => {
                     )}
 
                     <div class={"flex w-full h-3/5 border-b border-black"}>
-                        <div class={"flex flex-col w-full h-full border-t border-gray-800"}>
+                        <div class={"flex flex-col w-full h-full border-t border-gray-800 border-r border-r-black"}>
                             <div class={"flex w-full border-b border-gray-800"}>
                                 <div class={"flex w-full justify-between items-center p-2 border-b border-black"}>
                                     <div class={"flex items-center space-x-2"}>
                                         <div class={"text-md text-green-500"}>Files</div>
-                                        <div class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
-                                             onClick={() => addFile()}
-                                        title="Add File">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        <div
+                                            class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
+                                            onClick={() => addFile()}
+                                            title="Add File">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                             </svg>
                                         </div>
                                     </div>
@@ -256,7 +282,7 @@ const HomePage = () => {
                                 {filesList.map((file) => (
                                     <div
                                         class={"flex justify-between items-center border-b border-gray-800 p-2"}>
-                                        <div class={"w-2/5"}>{file.name}</div>
+                                        <div class={"w-2/5 break-all"}>{file.name}</div>
                                         <div class={"w-1/5"}>{file.type}</div>
                                         <div class={"w-1/5"}>{formatBytes(file.size)}</div>
                                         {file.remote ?
@@ -317,10 +343,44 @@ const HomePage = () => {
                             </div>
                         </div>
 
-                        {/*<div class={"w-2/5  h-full border-l border-gray-800"}>*/}
-                        {/*    <div*/}
-                        {/*        class={"flex flex-col w-full h-full border-l border-t border-t-gray-800 border-black"}></div>*/}
-                        {/*</div>*/}
+                        <div class={"flex flex-col w-2/5 h-full border-l border-gray-800"}>
+                            <div
+                                class={"flex items-center space-x-2 w-full border-t border-gray-800 border-b border-b-black p-[10px]"}>
+                                <div class={"text-md text-green-500"}>Chat</div>
+                            </div>
+                            <div
+                                class={"flex flex-col w-full h-full border-t border-t-gray-800 border-b border-b-black space-y-2 p-2 overflow-y-auto"}
+                                id={"messagesBox"}>
+                                {messages.map((message) => (
+                                    <div
+                                        class={`w-full h-auto p-2 rounded-lg ${message.type === "remote-message" ? "bg-green-500 bg-opacity-20 text-green-500 w-4/5" : "bg-gray-800 text-white self-end w-4/5"}`}>{message.content}</div>
+                                ))}
+                            </div>
+                            <div
+                                class={"flex items-center space-x-2 w-full border-t border-gray-800 p-2"}>
+                                <div
+                                    class="relative w-full h-auto max-h-32 bg-gray-800 rounded-lg text-black dark:text-white outline-none select-none focus:outline-green-500 p-2 overflow-y-auto"
+                                    placeholder="Type a message..."
+                                    contenteditable="true"
+                                    id="message"
+                                    onBlur={() => {
+                                    }}
+                                    onKeyPress={(event) => {
+                                        if (event.keyCode === 13) {
+                                            event.preventDefault();
+
+                                            setMessage(event.currentTarget.innerText);
+
+                                            if (message() === "") return;
+
+                                            event.currentTarget.innerText = "";
+
+                                            sendMessage();
+                                        }
+                                    }}
+                                ></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class={"flex w-full h-2/5"}>
@@ -337,8 +397,8 @@ const HomePage = () => {
                                             <div class={"flex justify-between items-center"}>
                                                 <div>{download.file.name}</div>
                                                 <div class={"flex items-center space-x-2 text-green-500"}>
-                                                    <div>{download.eta} s</div>
                                                     <div>{download.speed + `\\s`}</div>
+                                                    <div>{download.eta} s</div>
                                                 </div>
                                             </div>
                                             <div class={"w-full h-2 rounded-full bg-gray-800"}>
@@ -363,8 +423,8 @@ const HomePage = () => {
                                             <div class={"flex justify-between items-center"}>
                                                 <div>{upload.file.name}</div>
                                                 <div class={"flex items-center space-x-2 text-green-500"}>
-                                                    <div>{upload.eta} s</div>
                                                     <div>{upload.speed + `\\s`}</div>
+                                                    <div>{upload.eta} s</div>
                                                 </div>
                                             </div>
                                             <div class={"w-full h-2 rounded-full bg-gray-800"}>
