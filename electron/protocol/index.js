@@ -10,7 +10,7 @@ class Protocol {
         this.peerCount = 0;
         this.connections = [];
         this.messages = [];
-        this.files = new Set([]);
+        this.files = [];
         this.events = new Subject();
     }
 
@@ -32,34 +32,50 @@ class Protocol {
         });
 
         this.swarm.on("connection", (connection, information) => {
-            if (this.peerCount > 0) {
-                information.backoff();
-                connection.destroy();
-            }
-
-            if (information.type === 'utp') {
-                information.backoff();
-                connection.destroy();
-            }
-
             this.connections.push(connection);
 
             this.peerCount = this.peerCount + 1;
 
             this.events.next({type: "peer-count", count: this.peerCount});
 
+            this.connections[0].write(JSON.stringify({type: "get-remote-files"}));
+
             connection.on("data", (data) =>
                 this.events.next(JSON.parse(data.toString()))
             );
 
             this.events.subscribe((event) => {
+                if (event.type === "get-remote-files") return connection.write(JSON.stringify({
+                    type: "file-list",
+                    files: this.files.map((file) => {
+                        delete file.remote;
+
+                        return file;
+                    })
+                }));
+
+                if (event.type === "file-list") {
+                    this.files = new Set([...this.files, ...event.files]
+                        .map((file) => {
+                            if (file.owner !== Buffer.from(this.swarm.keyPair.publicKey).toString("hex")) return {
+                                ...file,
+                                remote: true
+                            };
+                            else return file;
+                        }).map(JSON.stringify));
+
+                    this.files = Array.from(this.files).map(JSON.parse);
+
+                    reply("file-list", this.files);
+                }
+
                 if (event.type === "local-message") {
                     reply("message", {type: "local-message", content: event.content});
                     connection.write(JSON.stringify({type: "remote-message", content: event.content}));
                 }
 
                 if (event.type === "remote-message") {
-                    this.messages.push({ type: "remote-message", content: event.content });
+                    this.messages.push({type: "remote-message", content: event.content});
                     reply("message", {type: "remote-message", content: event.content});
                 }
 
@@ -94,19 +110,21 @@ class Protocol {
                     type: "remote-file-removed"
                 }));
 
-                if (event.type === "remote-file-added") return this.addFile(event.file, false, reply);
-                if (event.type === "remote-file-removed") return this.removeFile(event.file, false, reply);
+                if (event.type === "remote-file-added") return this.addRemoteFile(event.file, reply);
+                if (event.type === "remote-file-removed") return this.removeRemoteFile(event.file, reply);
 
                 if (event.type === "download-file") return connection.write(JSON.stringify({
                     type: "request-download",
-                    key: event.key
+                    key: event.key,
+                    owner: event.owner,
+                    requester: Buffer.from(this.swarm.keyPair.publicKey).toString("hex")
                 }));
 
-                if (event.type === "request-download") {
+                if (event.type === "request-download" && event.owner === Buffer.from(this.swarm.keyPair.publicKey).toString("hex")) {
                     const {key} = event;
                     const size = statSync(key).size;
 
-                    const node = new UploadNode(key, size);
+                    const node = new UploadNode(key, event.requester, size);
 
                     node.events.subscribe((nodeEvent) => {
                         if (nodeEvent.type === "progress") return reply("progress", {
@@ -135,7 +153,7 @@ class Protocol {
                     return;
                 }
 
-                if (event.type === "upload-ready") {
+                if (event.type === "upload-ready" && event.requester === Buffer.from(this.swarm.keyPair.publicKey).toString("hex")) {
                     const {key, size} = event;
 
                     const node = new DownloadNode(key, size);
@@ -190,7 +208,7 @@ class Protocol {
     }
 
     sendMessage(message) {
-        this.messages.push({ type: "local-message", content: message });
+        this.messages.push({type: "local-message", content: message});
         this.events.next({type: "local-message", content: message});
     }
 
@@ -198,24 +216,50 @@ class Protocol {
         return this.messages;
     }
 
-    addFile(file, forRemote = true, reply = (event, data) => {
+    addLocalFile(file, reply = (event, data) => {
     }) {
-        file = {...file, remote: !forRemote};
+        file = {...file, owner: Buffer.from(this.swarm.keyPair.publicKey).toString("hex")};
 
-        this.files.add(file);
+        this.files.push(file);
 
-        if (forRemote) this.events.next({type: "local-file-added", file: {...file, remote: forRemote}});
-        else reply("file-list", this.files);
+        this.files = new Set(this.files.map(JSON.stringify));
+        this.files = Array.from(this.files).map(JSON.parse);
+
+        this.events.next({type: "local-file-added", file});
+        reply("file-list", this.files);
 
         return file;
     }
 
-    removeFile(file, forRemote = true, reply = (event, data) => {
+    removeLocalFile(file, reply = (event, data) => {
     }) {
-        this.files = new Set([...this.files].filter((el) => el.path !== file.path));
+        this.files = this.files.filter((el) => el.path !== file.path);
 
-        if (forRemote) this.events.next({type: "local-file-removed", file});
-        else reply("file-list", this.files);
+        this.events.next({type: "local-file-removed", file});
+        reply("file-list", this.files);
+
+        return file;
+    }
+
+    addRemoteFile(file, reply = (event, data) => {
+    }) {
+        file = {...file, remote: true};
+
+        this.files.push(file);
+
+        this.files = new Set(this.files.map(JSON.stringify));
+        this.files = Array.from(this.files).map(JSON.parse);
+
+        reply("file-list", this.files);
+
+        return file;
+    }
+
+    removeRemoteFile(file, reply = (event, data) => {
+    }) {
+        this.files = this.files.filter((el) => el.path !== file.path);
+
+        reply("file-list", this.files);
 
         return file;
     }

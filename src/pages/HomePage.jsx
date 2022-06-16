@@ -17,6 +17,7 @@ const HomePage = () => {
 
     onMount(() => {
         send("peer-count");
+        send("get-files");
         send("get-messages");
 
         receive("started", (event, data) => {
@@ -117,11 +118,7 @@ const HomePage = () => {
         })
 
         receive("file-list", (event, data) => {
-            let list = [];
-
-            data.forEach((value) => list.push({...value, downloaded: false}));
-
-            setFilesList(list)
+            setFilesList(data);
         });
     });
 
@@ -168,8 +165,8 @@ const HomePage = () => {
         send("remove-file", file);
     }
 
-    const downloadFile = (path) => {
-        send("download-file", path);
+    const downloadFile = (path, owner) => {
+        send("download-file", {key: path, owner});
     }
 
     const deleteFile = (name) => {
@@ -222,17 +219,6 @@ const HomePage = () => {
                     </div>
                 </div>
                 <div class={"relative flex flex-col w-full h-full"}>
-                    {peerData.peerCount === 0 && (
-                        <div class={"absolute w-full h-full flex flex-col justify-center items-center"}>
-                            <div class={"w-full h-full bg-black opacity-20 rounded-b-lg"}></div>
-                            <div class={"absolute flex space-x-2 justify-center items-center w-full h-full"}>
-                                <div>Waiting for a peer to join...</div>
-                                <div
-                                    class={"animate-spin w-5 h-5 border-l border-t border-green-500 border-1 rounded-full"}></div>
-                            </div>
-                        </div>
-                    )}
-
                     <div class={"flex w-full h-3/5 border-b border-black"}>
                         <div class={"flex flex-col w-full h-full border-t border-gray-800 border-r border-r-black"}>
                             <div class={"flex w-full border-b border-gray-800"}>
@@ -282,7 +268,7 @@ const HomePage = () => {
                                 {filesList.map((file) => (
                                     <div
                                         class={"flex justify-between items-center border-b border-gray-800 p-2"}>
-                                        <div class={"w-2/5 break-all"}>{file.name}</div>
+                                        <div class={"w-2/5 truncate text-ellipsis"}>{file.name}</div>
                                         <div class={"w-1/5"}>{file.type}</div>
                                         <div class={"w-1/5"}>{formatBytes(file.size)}</div>
                                         {file.remote ?
@@ -318,7 +304,7 @@ const HomePage = () => {
                                                 <div
                                                     class={"flex items-center space-x-2 w-auto h-auto p-1 bg-green-500 bg-opacity-10 text-green-500 rounded-lg cursor-pointer"}
                                                     title={"Download"}
-                                                    onClick={() => downloadFile(file.path)}>
+                                                    onClick={() => downloadFile(file.path, file.owner)}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -384,7 +370,7 @@ const HomePage = () => {
                     </div>
 
                     <div class={"flex w-full h-2/5"}>
-                        <div class={"flex flex-col w-full h-full border-t border-t-gray-800"}>
+                        <div class={"flex flex-col w-1/2 h-full border-t border-t-gray-800"}>
                             <div class={"w-full h-auto border-b border-r border-gray-800 border-r-black"}>
                                 <div
                                     class={"flex items-center w-full h-auto p-2 border-b border-black text-green-500"}>Downloads
@@ -395,7 +381,7 @@ const HomePage = () => {
                                     {downloadsList.map((download) => (
                                         <div class={"flex flex-col space-y-2 p-2 border-b border-gray-800"}>
                                             <div class={"flex justify-between items-center"}>
-                                                <div>{download.file.name}</div>
+                                                <div class={"w-3/5 truncate text-ellipsis"}>{download.file.name}</div>
                                                 <div class={"flex items-center space-x-2 text-green-500"}>
                                                     <div>{download.speed + `\\s`}</div>
                                                     <div>{download.eta} s</div>
@@ -410,7 +396,7 @@ const HomePage = () => {
                                 </div>
                             </div>
                         </div>
-                        <div class={"flex flex-col w-full h-full border-t border-t-gray-800"}>
+                        <div class={"flex flex-col w-1/2 h-full border-t border-t-gray-800"}>
                             <div class={"w-full h-auto border-b border-gray-800 border-l border-l-gray-800"}>
                                 <div
                                     class={"flex items-center w-full h-auto p-2 border-b border-black text-green-500"}>Uploads
@@ -421,7 +407,7 @@ const HomePage = () => {
                                     {uploadsList.map((upload) => (
                                         <div class={"flex flex-col space-y-2 p-2 border-b border-gray-800"}>
                                             <div class={"flex justify-between items-center"}>
-                                                <div>{upload.file.name}</div>
+                                                <div class={"w-3/5 truncate text-ellipsis"}>{upload.file.name}</div>
                                                 <div class={"flex items-center space-x-2 text-green-500"}>
                                                     <div>{upload.speed + `\\s`}</div>
                                                     <div>{upload.eta} s</div>
