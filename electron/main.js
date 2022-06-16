@@ -97,20 +97,26 @@ ipcMain.on("closeWindow", (_, __) => {
     mainWindow.close();
 });
 
-ipcMain.on("add-file", (event, data) => {
-    protocol.addFile(data, true, (event, data) => event.reply(event, data));
+ipcMain.on("get-files", (event, _) => {
+    event.reply("file-list", protocol.files.map((file) => {
+        if (file.owner !== Buffer.from(protocol.swarm.keyPair.publicKey).toString("hex")) return {
+            ...file,
+            remote: true
+        };
+        else return file;
+    }));
+});
 
-    event.reply("file-list", protocol.files);
+ipcMain.on("add-file", (event, data) => {
+    protocol.addLocalFile(data, (_event, _data) => event.reply(_event, _data));
 });
 
 ipcMain.on("remove-file", (event, data) => {
-    protocol.removeFile(data, true, (event, data) => event.reply(event, data));
-
-    event.reply("file-list", protocol.files);
+    protocol.removeLocalFile(data, (_event, _data) => event.reply(_event, _data));
 });
 
-ipcMain.on("download-file", (event, path) => {
-    protocol.events.next({type: "download-file", key: path});
+ipcMain.on("download-file", (event, data) => {
+    protocol.events.next({type: "download-file", key: data.key, owner: data.owner});
 });
 
 ipcMain.on("delete-file", (event, name) => {

@@ -5,8 +5,9 @@ const crypto = require("hypercore-crypto");
 const progress = require("progress-stream");
 
 class UploadNode {
-    constructor(key, size) {
+    constructor(key, requester, size) {
         this.key = key;
+        this.requester = requester;
         this.size = size;
         this.events = new Subject();
 
@@ -19,7 +20,7 @@ class UploadNode {
         this.server.on("listening", () => {
             console.log("File tunnel open for " + this.key, this.size);
 
-            this.events.next({type: "upload-ready", key: this.key, size: this.size});
+            this.events.next({type: "upload-ready", key: this.key, size: this.size, requester: this.requester});
         });
 
         this.server.on("close", () => {
