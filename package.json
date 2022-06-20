@@ -84,7 +84,9 @@
     "@hyperswarm/dht": "^5.0.25",
     "@rturnq/solid-router": "^0.3.0",
     "@telios/nebula": "^2.5.8",
+    "bcrypt": "^5.0.1",
     "copy-files-from-to": "^3.2.2",
+    "crypto-js": "^4.1.1",
     "dotenv": "^16.0.1",
     "electron-updater": "^5.0.1",
     "file-type": "^17.1.1",
@@ -98,6 +100,7 @@
     "socket.io": "^4.5.1",
     "solid-js": "^1.4.2",
     "solid-transition-group": "^0.0.8",
-    "util": "^0.12.4"
+    "util": "^0.12.4",
+    "uuid": "^8.3.2"
   }
 }
