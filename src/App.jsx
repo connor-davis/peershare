@@ -9,11 +9,7 @@ import useState from './hooks/state';
 
 function App() {
   let [userState, updateUserState, clearUserState] = useState('user');
-
-  onMount(() => {
-    clearUserState();
-  });
-
+  
   return (
     <div class="dark rounded-lg">
       <div class="flex flex-col w-screen h-screen text-black bg-white dark:text-white dark:bg-gray-900 rounded-lg">
@@ -54,7 +50,6 @@ function App() {
               }
               onClick={() => {
                 send('closeWindow');
-                clearUserState();
               }}
             >
               <CloseIcon />
