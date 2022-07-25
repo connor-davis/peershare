@@ -11,15 +11,15 @@ function App() {
   let [userState, updateUserState, clearUserState] = useState('user');
   
   return (
-    <div class="dark rounded-lg">
-      <div class="flex flex-col w-screen h-screen text-black bg-white dark:text-white dark:bg-gray-900 rounded-lg">
+    <div class="dark">
+      <div class="flex flex-col w-screen h-screen text-black bg-white dark:text-white dark:bg-gray-900">
         <div
           class={
-            'flex justify-between items-center w-full bg-gray-800 rounded-t-lg'
+            'flex justify-between items-center w-full bg-gray-800'
           }
           style={{ '-webkit-app-region': 'drag' }}
         >
-          <div></div>
+          <div class="px-1 text-green-400 font-bold">PeerShare</div>
           <div
             class={'flex items-center'}
             style={{ '-webkit-app-region': 'no-drag' }}
@@ -46,7 +46,7 @@ function App() {
             </div>
             <div
               class={
-                'flex flex-col w-6 h-6 justify-center items-center p-2 hover:bg-red-500 cursor-pointer rounded-tr-lg'
+                'flex flex-col w-6 h-6 justify-center items-center p-2 hover:bg-red-500 cursor-pointer'
               }
               onClick={() => {
                 send('closeWindow');

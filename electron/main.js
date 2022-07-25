@@ -23,8 +23,12 @@ const createMainWindow = () => {
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
+    minWidth: 1280,
+    minHeight: 720,
+    resizable: true,
     show: false,
     frame: false,
+    autoHideMenuBar: true,
     center: true,
     transparent: true,
     webPreferences: {
@@ -91,8 +95,10 @@ app.on('window-all-closed', () => {
   settings.saveSettings();
   sessionManager.saveSessions();
 
-  protocol.killSwarm().then(() => {
-    if (process.platform !== 'darwin') app.quit();
+  protocol.killSharingSwarm().then(() => {
+    protocol.killMessagingSwarm().then(() => {
+      if (process.platform !== 'darwin') app.quit();
+    });
   });
 });
 

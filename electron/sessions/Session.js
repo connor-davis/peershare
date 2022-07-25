@@ -29,6 +29,9 @@ class Session {
     this.protocol = new Protocol((event, data) =>
       this.events.next({ type: event, ...data })
     );
+
+    this.protocol.createSharingSwarm(this.sessionData.sessionName + "-sharing");
+    this.protocol.createMessagingSwarm(this.sessionData.sessionName + "-messaging");
   }
 
   loadSessionData() {
