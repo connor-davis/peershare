@@ -23,4 +23,5 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: 'dist/peershare-setup.exe'
+          allowUpdates: true
+          artifacts: 'dist/PeerShare-${{ github.ref_name }}-Setup.exe'
