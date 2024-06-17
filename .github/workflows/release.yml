@@ -1,5 +1,5 @@
 name: Release
-on:  
+on:
   push:
     tags:
       - '*'
@@ -22,4 +22,4 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: 'peershare-setup.exe'
+          artifacts: 'dist/peershare-setup.exe'
