@@ -7,12 +7,17 @@ jobs:
   build_on_win:
     runs-on: windows-latest
     steps:
-      - uses: actions/setup-node@master
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+      - name: Setup NodeJS
+        uses: actions/setup-node@master
         with:
           node-version: 20.14.0
-      - name: run build
+      - name: Build Setup
         run: npm run build:win
-      - name: create release
+      - name: Create Release
         uses: elgohr/Github-Release-Action@v5
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
