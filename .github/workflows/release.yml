@@ -8,15 +8,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@master
         with:
-          path: main
+          path: ./
       - name: Setup NodeJS
         uses: actions/setup-node@master
         with:
           node-version: 20.14.0
-      - name: Open Checkout
-        run: cd main
       - name: Build Setup
         run: npm run build:win
       - name: Create Release
