@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 20.14.0
       - name: List
-        run: ls
+        run: ls main
       # - name: Build Setup
       #   run: npm run build:win
       # - name: Create Release
