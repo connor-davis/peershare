@@ -5,3 +5,4 @@ out
 *.log*
 settings.json
 Downloads/
+.env
