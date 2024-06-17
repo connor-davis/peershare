@@ -7,10 +7,6 @@ jobs:
   build_on_win:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@master
-        token: ${{ secrets.GH_TOKEN }}
-        with:
-          ref: feature/github-actions
       - uses: actions/setup-node@master
         with:
           node-version: 20.14.0
