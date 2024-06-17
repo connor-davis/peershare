@@ -1,7 +1,7 @@
 {
   "name": "peershare",
   "version": "1.0.0",
-  "description": "Peer-To-Peer File Sharing thanks to https://holepunch.to",
+  "description": "PeerShare for Peer-To-Peer File Sharing thanks to https://holepunch.to",
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://peershare.lonewolf-software.co.za",
