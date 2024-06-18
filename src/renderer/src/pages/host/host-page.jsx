@@ -137,11 +137,9 @@ export default function HostPage() {
                   {files.length > 0 &&
                     files.map((file, index) => (
                       <div key={index} className="flex w-full border-b py-2 border-border">
-                        <div className="flex flex-col space-y-1 w-full">
-                          <Label>{file.fileName}</Label>
-                          <Label className="text-muted-foreground truncate text-ellipsis">
-                            {file.filePath}
-                          </Label>
+                        <div className="flex flex-col space-y-1 w-full overflow-hidden">
+                          <Label className="truncate">{file.fileName}</Label>
+                          <Label className="text-muted-foreground truncate">{file.filePath}</Label>
                         </div>
                         <Button
                           size="icon"

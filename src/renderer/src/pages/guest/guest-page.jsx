@@ -118,10 +118,8 @@ export default function GuestPage() {
                     files.map((file) => (
                       <div className="flex w-full border-b py-2 border-border">
                         <div className="flex flex-col space-y-1 w-full">
-                          <Label>{file.fileName}</Label>
-                          <Label className="text-muted-foreground truncate text-ellipsis">
-                            {file.filePath}
-                          </Label>
+                          <Label className="truncate">{file.fileName}</Label>
+                          <Label className="text-muted-foreground truncate">{file.filePath}</Label>
                         </div>
                         <Button
                           size="icon"
